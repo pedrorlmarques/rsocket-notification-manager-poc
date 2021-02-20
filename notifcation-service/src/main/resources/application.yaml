@@ -1,0 +1,60 @@
+spring:
+  config:
+    activate:
+      on-profile: default
+  application:
+    name: notification-service
+  data:
+    mongodb:
+      database: notificationdb
+      username: notificationUser
+      password: Pa$$w0rd123
+  rsocket:
+    server:
+      port: 9999
+      transport: tcp
+kafka:
+  bootstrap-servers: localhost:9092
+  producer:
+    key.serializer: org.apache.kafka.common.serialization.StringSerializer
+    value.serializer: org.apache.kafka.common.serialization.StringSerializer
+  consumer:
+    group.id: ${spring.application.name}-notification-group
+    key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    auto.offset.reset: earliest
+
+notification:
+  topic: notifications
+  host: localhost
+  port: 8888
+
+#server:
+#  port: 8082
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  application:
+    name: notification-service
+  rsocket:
+    server:
+      port: 9999
+      transport: tcp
+
+kafka:
+  bootstrap-servers: localhost:9092
+  producer:
+    key.serializer: org.apache.kafka.common.serialization.StringSerializer
+    value.serializer: org.apache.kafka.common.serialization.StringSerializer
+  consumer:
+    group.id: ${spring.application.name}-notification-group
+    key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    auto.offset.reset: earliest
+
+notification:
+  topic: notifications
+  host: localhost
+  port: 8888
