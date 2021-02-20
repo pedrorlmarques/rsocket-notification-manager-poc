@@ -24,13 +24,13 @@ kafka:
     value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
     auto.offset.reset: earliest
 
-notification:
-  topic: notifications
+client-manager-notification:
   host: localhost
   port: 8888
 
-#server:
-#  port: 8082
+notification:
+  topic: notifications
+
 ---
 spring:
   config:
@@ -54,7 +54,9 @@ kafka:
     value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
     auto.offset.reset: earliest
 
-notification:
-  topic: notifications
+client-manager-notification:
   host: localhost
   port: 8888
+
+notification:
+  topic: notifications

@@ -14,13 +14,9 @@ public class Notification {
 
     @Id
     private String id;
-
     private String userId;
-
     private String header;
-
     private String body;
-
     private NotificationType notificationType;
 
 }

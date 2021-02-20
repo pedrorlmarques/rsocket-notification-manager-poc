@@ -29,25 +29,19 @@ import static org.awaitility.Awaitility.await;
 @ActiveProfiles("test")
 class KafkaNotificationListenerConfigurationTest implements KafkaContainerTestingSupport {
 
+    @Value("${notification.topic}")
+    private String topicName;
 
     // volatile guarantees visibility across threads.
     // MonoProcessor implements stateful semantics for a mono
     private volatile MonoProcessor<Object> result;
-
-
     private CloseableChannel closeableChannel;
-
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Value("${notification.topic}")
-    private String topicName;
-
     @Autowired
     private NotificationRepository notificationRepository;
-
-    @Value("${notification.port}")
-    private int port;
+    @Autowired
+    private ClientManagerNotificationProperties clientManagerNotificationProperties;
 
     @BeforeEach
     public void setUp() {
@@ -62,7 +56,7 @@ class KafkaNotificationListenerConfigurationTest implements KafkaContainerTestin
                     result.onComplete();
                     return Mono.empty();
                 }))
-                .bind(TcpServerTransport.create(port))
+                .bind(TcpServerTransport.create(clientManagerNotificationProperties.getPort()))
                 .block();
     }
 

@@ -2,7 +2,6 @@ package com.example.notifcationservice.configuration;
 
 import com.example.notifcationservice.client.ClientManagerNotificationClient;
 import com.example.notifcationservice.repository.NotificationRepository;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,43 +14,36 @@ import reactor.kafka.receiver.ReceiverOptions;
 import java.time.Duration;
 import java.util.Collections;
 
-import static com.example.notifcationservice.utils.NotificationUtils.convertToNotification;
+import static com.example.notifcationservice.utils.NotificationUtils.handleNotification;
 
 @Configuration
-@Log4j2
 public class KafkaNotificationListenerConfiguration {
 
     private final NotificationRepository notificationRepository;
     private final Scheduler notificationScheduler;
     private final ClientManagerNotificationClient clientManagerNotificationClient;
+    private final KafkaProperties kafkaProperties;
 
     public KafkaNotificationListenerConfiguration(NotificationRepository notificationRepository,
-                                                  ClientManagerNotificationClient clientManagerNotificationClient) {
+                                                  ClientManagerNotificationClient clientManagerNotificationClient,
+                                                  KafkaProperties kafkaProperties) {
         this.notificationRepository = notificationRepository;
         this.clientManagerNotificationClient = clientManagerNotificationClient;
+        this.kafkaProperties = kafkaProperties;
         this.notificationScheduler = Schedulers.newSingle("notification-scheduler", true);
     }
 
     @Bean
-    Disposable notificationKafkaListener(final KafkaProperties kafkaProperties,
-                                         @Value("${notification.topic}") final String topicName) {
-
+    Disposable notificationKafkaListener(@Value("${notification.topic}") final String topicName) {
         return KafkaReceiver.create(ReceiverOptions.
-                <String, String>create(kafkaProperties.getConsumerProps())
+                <String, String>create(this.kafkaProperties.getConsumerProps())
                 .subscription(Collections.singleton(topicName))
                 .commitInterval(Duration.ZERO))
                 .receive()
                 .publishOn(this.notificationScheduler)
-                .concatMap(record -> convertToNotification(record.value())
-                        .doOnNext(notification -> log.info("Received {}", notification))
-                        .flatMap(this.notificationRepository::save)
-                        .flatMapMany(clientManagerNotificationClient::sendNotification)
-                        .then(record.receiverOffset().commit())
-                )
+                .concatMap(handleNotification(clientManagerNotificationClient, notificationRepository))
                 .retry()
                 .doOnCancel(this.notificationScheduler::dispose)
                 .subscribe();
     }
-
-
 }
