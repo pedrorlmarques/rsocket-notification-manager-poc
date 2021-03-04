@@ -3,6 +3,7 @@ package com.example.notifcationservice.configuration;
 import com.example.notifcationservice.KafkaContainerTestingSupport;
 import com.example.notifcationservice.NotifcationServiceApplication;
 import com.example.notifcationservice.domain.Notification;
+import com.example.notifcationservice.domain.NotificationDTO;
 import com.example.notifcationservice.domain.NotificationType;
 import com.example.notifcationservice.repository.NotificationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,17 +70,23 @@ class KafkaNotificationListenerConfigurationTest implements KafkaContainerTestin
     @Test
     void testGivenNotificationShouldPersistOnDatabaseAndSentNotificationToClientManagerService() throws Exception {
 
-        var notification = new Notification();
-        notification.setUserId("8a4dade4-6660-11eb-ae93-0242ac130002");
-        notification.setHeader("WMA06KZZ9LM857901");
-        notification.setBody("asd13");
-        notification.setNotificationType(NotificationType.SUCCESS);
+        var notificationDTO = new NotificationDTO();
+        notificationDTO.setUserId("8a4dade4-6660-11eb-ae93-0242ac130002");
+        notificationDTO.setHeader("WMA06KZZ9LM857901");
+        notificationDTO.setBody("asd13");
+        notificationDTO.setNotificationType(NotificationType.SUCCESS);
 
         try (var producer = createProducer()) {
-            final var message = this.objectMapper.writeValueAsString(notification);
-            final var producerRecord = new ProducerRecord<>(this.topicName, notification.getUserId(), message);
+            final var message = this.objectMapper.writeValueAsString(notificationDTO);
+            final var producerRecord = new ProducerRecord<>(this.topicName, notificationDTO.getUserId(), message);
             producer.send(producerRecord).get();
         }
+
+        var notification = new Notification();
+        notification.setUserId(notificationDTO.getUserId());
+        notification.setHeader(notificationDTO.getHeader());
+        notification.setBody(notificationDTO.getBody());
+        notification.setNotificationType(notificationDTO.getNotificationType().name());
 
         await().untilAsserted(() -> {
             var notificationPersisted = this.notificationRepository.findAll().blockFirst();

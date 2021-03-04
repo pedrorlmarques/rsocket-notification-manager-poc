@@ -1,7 +1,8 @@
 package com.example.notifcationservice.utils;
 
 import com.example.notifcationservice.client.ClientManagerNotificationClient;
-import com.example.notifcationservice.domain.Notification;
+import com.example.notifcationservice.domain.NotificationDTO;
+import com.example.notifcationservice.mapper.NotificationMapper;
 import com.example.notifcationservice.repository.NotificationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
@@ -15,15 +16,15 @@ import java.util.function.Function;
 public final class NotificationUtils {
 
     private NotificationUtils() {
-        throw new IllegalCallerException("Utility class");
+        //private constructor
     }
 
     /*
         Since Read Value from Jackson is a Blocking call we should wrap the operation on a different thread
         https://projectreactor.io/docs/core/release/reference/#faq.wrap-blocking
      */
-    public static Mono<Notification> convertToNotification(final String notification) {
-        return Mono.fromCallable(() -> new ObjectMapper().readValue(notification, Notification.class))
+    public static Mono<NotificationDTO> convertToNotification(final String notification) {
+        return Mono.fromCallable(() -> new ObjectMapper().readValue(notification, NotificationDTO.class))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -36,6 +37,7 @@ public final class NotificationUtils {
 
         return record -> convertToNotification(record.value())
                 .doOnNext(notification -> log.info("Received {}", notification))
+                .map(NotificationMapper::convertNotificationDTOtoNotification)
                 .flatMap(notificationRepository::save)
                 .flatMap(clientManagerNotificationClient::sendNotification)
                 .then(record.receiverOffset().commit());
