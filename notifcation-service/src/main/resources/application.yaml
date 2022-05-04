@@ -42,6 +42,9 @@ spring:
     server:
       port: 9999
       transport: tcp
+  mongodb:
+    embedded:
+      version: 3.0.0
 
 kafka:
   bootstrap-servers: localhost:9092
@@ -60,3 +63,4 @@ client-manager-notification:
 
 notification:
   topic: notifications
+

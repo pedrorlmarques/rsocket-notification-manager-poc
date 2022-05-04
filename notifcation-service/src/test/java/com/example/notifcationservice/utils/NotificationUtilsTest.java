@@ -18,11 +18,9 @@ class NotificationUtilsTest {
                 "  \"body\" : \"asd13\"\n" +
                 "}";
 
-        var expectedNotification = new NotificationDTO();
-        expectedNotification.setUserId("8a4dade4-6660-11eb-ae93-0242ac130002");
-        expectedNotification.setHeader("WMA06KZZ9LM857901");
-        expectedNotification.setNotificationType(NotificationType.SUCCESS);
-        expectedNotification.setBody("asd13");
+        var expectedNotification = new NotificationDTO("8a4dade4-6660-11eb-ae93-0242ac130002",
+                "WMA06KZZ9LM857901",
+                "asd13", NotificationType.SUCCESS);
 
         StepVerifier.create(NotificationUtils.convertToNotification(notificationString).log())
                 .expectSubscription()
@@ -39,10 +37,8 @@ class NotificationUtilsTest {
                 "  \"body123\" : \"asd13\"\n" +
                 "}";
 
-        var expectedNotification = new NotificationDTO();
-        expectedNotification.setUserId("8a4dade4-6660-11eb-ae93-0242ac130002");
-        expectedNotification.setHeader("WMA06KZZ9LM857901");
-        expectedNotification.setBody("asd13");
+        var expectedNotification = new NotificationDTO(
+                "8a4dade4-6660-11eb-ae93-0242ac130002", "WMA06KZZ9LM857901", "asd13", null);
 
         StepVerifier.create(NotificationUtils.convertToNotification(notificationString).log())
                 .expectSubscription()

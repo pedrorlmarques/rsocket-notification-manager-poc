@@ -11,19 +11,16 @@ class NotificationMapperTest {
     @Test
     void testGivenNotificationDTOItShouldConvertToNotification() {
 
-        var notificationDTO = new NotificationDTO();
-        notificationDTO.setUserId("8a4dade4-6660-11eb-ae93-0242ac130002");
-        notificationDTO.setHeader("WMA06KZZ9LM857901");
-        notificationDTO.setBody("asd13");
-        notificationDTO.setNotificationType(NotificationType.SUCCESS);
+        var notificationDTO = new NotificationDTO("8a4dade4-6660-11eb-ae93-0242ac130002",
+                "WMA06KZZ9LM857901", "asd13", NotificationType.SUCCESS);
 
         var notification = NotificationMapper.convertNotificationDTOtoNotification(notificationDTO);
 
         assertThat(notification).isNotNull();
-        assertThat(notification.getNotificationType()).isNotNull().isEqualTo(notificationDTO.getNotificationType().name());
-        assertThat(notification.getUserId()).isNotNull().isEqualTo(notificationDTO.getUserId());
-        assertThat(notification.getHeader()).isNotNull().isEqualTo(notificationDTO.getHeader());
-        assertThat(notification.getBody()).isNotNull().isEqualTo(notificationDTO.getBody());
+        assertThat(notification.notificationType()).isNotNull().isEqualTo(notificationDTO.notificationType().name());
+        assertThat(notification.userId()).isNotNull().isEqualTo(notificationDTO.userId());
+        assertThat(notification.header()).isNotNull().isEqualTo(notificationDTO.header());
+        assertThat(notification.body()).isNotNull().isEqualTo(notificationDTO.body());
 
     }
 

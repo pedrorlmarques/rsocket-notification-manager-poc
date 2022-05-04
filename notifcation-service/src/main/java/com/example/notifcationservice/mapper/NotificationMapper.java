@@ -15,13 +15,7 @@ public final class NotificationMapper {
             return null;
         }
 
-        var notification = new Notification();
-        notification.setUserId(notificationDTO.getUserId());
-        notification.setBody(notificationDTO.getBody());
-        notification.setHeader(notificationDTO.getHeader());
-        notification.setNotificationType(notificationDTO.getNotificationType().name());
-
-        return notification;
+        return new Notification(null, notificationDTO.userId(), notificationDTO.header(), notificationDTO.body(), notificationDTO.notificationType().name());
     }
 
 }
