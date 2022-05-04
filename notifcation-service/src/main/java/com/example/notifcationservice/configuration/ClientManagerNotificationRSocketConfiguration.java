@@ -12,6 +12,6 @@ public class ClientManagerNotificationRSocketConfiguration {
     @Bean
     RSocketRequester rSocketRequester(final RSocketRequester.Builder builder,
                                       final ClientManagerNotificationProperties clientManagerNotificationProperties) {
-        return builder.tcp(clientManagerNotificationProperties.getHost(), clientManagerNotificationProperties.getPort());
+        return builder.tcp(clientManagerNotificationProperties.host(), clientManagerNotificationProperties.port());
     }
 }

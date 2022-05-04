@@ -57,7 +57,7 @@ class KafkaNotificationListenerConfigurationTest implements KafkaContainerTestin
                             result.emitEmpty(Sinks.EmitFailureHandler.FAIL_FAST);
                             return Mono.empty();
                         }))
-                .bind(TcpServerTransport.create(clientManagerNotificationProperties.getPort()))
+                .bind(TcpServerTransport.create(clientManagerNotificationProperties.port()))
                 .block();
     }
 
